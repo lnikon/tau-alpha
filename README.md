@@ -1,4 +1,4 @@
-# tau-alpha - a homelab
+# tau-alpha
 
 ## Description
 tau-alpha is my attempt to tackle the world of infrastructure. In simple words, tau-alpha is a collection of scripts, configs, playbooks, etc...
