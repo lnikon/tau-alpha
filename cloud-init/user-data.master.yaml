@@ -1,0 +1,44 @@
+#cloud-config
+
+hostname: k3s-master
+# update /etc/hosts according to hostname (otherwise sudo will complain)
+manage_etc_hosts: true
+locale: en_US.UTF-8
+timezone: Europe/Berlin
+
+users:
+- default # pi user
+- name: nikon
+  groups: sudo
+  sudo: "ALL=(ALL) NOPASSWD:ALL"
+  # set to false to allow password login for this user
+  # only for verifying with dockerpi, passwd auth over SSH should be disabled
+  lock_passwd: true
+  shell: /bin/bash
+  # salt + hashed password, generate with `mkpasswd` or `openssl passwd -6`
+  ssh_authorized_keys:
+  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDU4LFJeVb4twDY94kMcRU74e+mn9HzcS3kSxs7VWgaxiMBqBKRn1Md/d8M1HynF0Hg196375YxOftEzrWOa72dpa5GdKpMDiSxHS00AGkZkDj7WYmoaijm2Y87MKRlD4ETFAkZ9FUZoKKnaLeAu5fHzFiI5rKuNZfSrYPqgW3e8tSa5ZSFXwM+uOe493gPK7d6Z6LonJarl+szeDHqRoOKOnzNrTIMq42f/DO+G3utPAPARMy4octjRZ/krIT2UZgcurOHHK/HjgrBS7nfsItBVNIb8QRSH+xlpkau+iK4AfX5GIYZKktvXnF1o0E+ofrkpdWJFwqaIRmO6i39l/RHOOqtSRzQJLgZLsyZjGZ87fDonyzXs+0adWwVovFx7jfCZN1NcB102XBeJtBwsnvIiFUy+lOmVy7xW3a57bevJNHtLlj/0k8Pc+2sqSrhLDQrf4JHNdm+okwDtNRt+kV7S7auJuXHT32yYObscyAAGY2zuTZMFXQC/OMY2kTXXn3jVJbcarMl9j1LelEBoG2XZTbt++lpMdopYCw46uVzkgqLrx8VvEEXf+PFz+luPiO5GlDnmgU6TgeG3XHVWXUOde+p7HhktW3GugVieto0HbpRaSD5ugOuXK/6oYI3DluWYaOmXidm+wYxNr1e9NApJeM9pa3hDC6uLqFjznAhCw== bejanyan.vahag@protonmail.com
+
+ssh_authorized_keys:
+- ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDU4LFJeVb4twDY94kMcRU74e+mn9HzcS3kSxs7VWgaxiMBqBKRn1Md/d8M1HynF0Hg196375YxOftEzrWOa72dpa5GdKpMDiSxHS00AGkZkDj7WYmoaijm2Y87MKRlD4ETFAkZ9FUZoKKnaLeAu5fHzFiI5rKuNZfSrYPqgW3e8tSa5ZSFXwM+uOe493gPK7d6Z6LonJarl+szeDHqRoOKOnzNrTIMq42f/DO+G3utPAPARMy4octjRZ/krIT2UZgcurOHHK/HjgrBS7nfsItBVNIb8QRSH+xlpkau+iK4AfX5GIYZKktvXnF1o0E+ofrkpdWJFwqaIRmO6i39l/RHOOqtSRzQJLgZLsyZjGZ87fDonyzXs+0adWwVovFx7jfCZN1NcB102XBeJtBwsnvIiFUy+lOmVy7xW3a57bevJNHtLlj/0k8Pc+2sqSrhLDQrf4JHNdm+okwDtNRt+kV7S7auJuXHT32yYObscyAAGY2zuTZMFXQC/OMY2kTXXn3jVJbcarMl9j1LelEBoG2XZTbt++lpMdopYCw46uVzkgqLrx8VvEEXf+PFz+luPiO5GlDnmgU6TgeG3XHVWXUOde+p7HhktW3GugVieto0HbpRaSD5ugOuXK/6oYI3DluWYaOmXidm+wYxNr1e9NApJeM9pa3hDC6uLqFjznAhCw== bejanyan.vahag@protonmail.com
+
+# set to true to allow ssh password authentication (disabled by default)
+ssh_pwauth: false
+
+bootcmd:
+# disable ipv6 on all interfaces
+- sysctl net.ipv6.conf.all.disable_ipv6=1
+
+write_files:
+- path: /var/lib/cloud/scripts/per-boot/01-hello-world.sh
+  permissions: "0744"
+  content: |
+    #!/bin/bash
+    echo "Hello cloud-init on Raspberry Pi!"
+    date > /tmp/per-boot-was-here
+- path: /var/lib/cloud/scripts/per-once/01-hello-world.sh
+  permissions: "0744"
+  content: |
+    #!/bin/bash
+    echo "Hello cloud-init on Raspberry Pi!"
+    date > /tmp/per-once-was-here

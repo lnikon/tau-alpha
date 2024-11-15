@@ -1,0 +1,41 @@
+# cloud-init configuration for Worker Node
+# Save as cloud-init/worker.yaml
+#cloud-config
+
+# Set hostname dynamically based on instance name
+hostname: k8s-worker
+
+# Update and upgrade the system
+package_update: true
+package_upgrade: true
+
+# Set up SSH authorized keys for remote access
+ssh_authorized_keys:
+  - ssh-rsa AAAAB3NzaC1y...YourPublicKey
+
+# Install Docker and required packages for Kubernetes
+packages:
+  - docker.io
+  - apt-transport-https
+  - curl
+  - ca-certificates
+  - software-properties-common
+
+# Create a user for Ansible with sudo privileges
+users:
+  - name: ansible
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - ssh-rsa AAAAB3NzaC1y...YourPublicKey
+
+# Install Kubernetes binaries
+runcmd:
+  - curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+  - echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" | tee -a /etc/apt/sources.list.d/kubernetes.list
+  - apt-get update
+  - apt-get install -y kubeadm kubelet kubectl
+
+# Mark as ready for Kubernetes join command
+final_message: "Worker node is ready to join Kubernetes cluster."
+
